@@ -23,14 +23,6 @@ This repository contains the **frontend** of the TurfNation project, built with 
 - Scalable component structure
 - Ready for backend integration (JWT-based auth planned)
 
----
-
-## 🎨 Design Reference
-
-Figma Design:  
-https://www.figma.com/design/Ahqz4RFGbft9VzGbToEkHO/TurfNation-Website-Pages
-
----
 
 ## 🛠️ Getting Started
 
