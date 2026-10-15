@@ -30,12 +30,13 @@ export function DashboardSidebar({ userType = 'user' }: SidebarProps) {
 
   return (
     <div className="w-64 bg-white rounded-2xl shadow-lg p-6 h-fit sticky top-6">
-      <div 
-        className="text-[#0F7A33] uppercase tracking-wider mb-8" 
+      <button 
+        onClick={() => navigate('/')}
+        className="text-[#0F7A33] uppercase tracking-wider mb-8 text-left cursor-pointer hover:opacity-80 transition-opacity" 
         style={{ fontSize: '24px', fontWeight: '700', fontFamily: 'Inter, sans-serif' }}
       >
         TurfNation
-      </div>
+      </button>
 
       <nav className="space-y-2">
         {menuItems.map((item) => {
@@ -44,7 +45,7 @@ export function DashboardSidebar({ userType = 'user' }: SidebarProps) {
           
           return (
             <button
-              key={item.path}
+              key={item.label}
               onClick={() => navigate(item.path)}
               className={`
                 w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all

@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Trophy, Calendar, MapPin, Users, Plus, Filter } from 'lucide-react';
 import { Navbar } from '../components/Navbar';
@@ -6,6 +7,17 @@ import { DashboardSidebar } from '../components/DashboardSidebar';
 
 export default function TournamentsPage() {
   const navigate = useNavigate();
+  const [selectedSport, setSelectedSport] = useState('');
+  const [selectedStatus, setSelectedStatus] = useState('');
+  const [joinedTournaments, setJoinedTournaments] = useState<number[]>([]);
+
+  const handleJoinTournament = (tournamentId: number) => {
+    setJoinedTournaments((prev) =>
+      prev.includes(tournamentId)
+        ? prev.filter((id) => id !== tournamentId)
+        : [...prev, tournamentId]
+    );
+  };
 
   const tournaments = [
     {
@@ -84,16 +96,20 @@ export default function TournamentsPage() {
             <div className="bg-white rounded-2xl shadow-lg p-4 mb-8">
               <div className="flex flex-col md:flex-row gap-4">
                 <select
+                  value={selectedSport}
+                  onChange={(e) => setSelectedSport(e.target.value)}
                   className="flex-1 px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0F7A33]"
                   style={{ fontFamily: 'Inter, sans-serif' }}
                 >
                   <option value="">All Sports</option>
-                  <option value="football">Football</option>
-                  <option value="cricket">Cricket</option>
-                  <option value="basketball">Basketball</option>
-                  <option value="badminton">Badminton</option>
+                  <option value="Football">Football</option>
+                  <option value="Cricket">Cricket</option>
+                  <option value="Basketball">Basketball</option>
+                  <option value="Badminton">Badminton</option>
                 </select>
                 <select
+                  value={selectedStatus}
+                  onChange={(e) => setSelectedStatus(e.target.value)}
                   className="flex-1 px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0F7A33]"
                   style={{ fontFamily: 'Inter, sans-serif' }}
                 >
@@ -103,19 +119,33 @@ export default function TournamentsPage() {
                   <option value="ongoing">Ongoing</option>
                   <option value="completed">Completed</option>
                 </select>
-                <button
-                  className="bg-[#E7F8ED] text-[#0F7A33] px-6 py-3 rounded-xl hover:bg-[#0F7A33] hover:text-white transition-colors flex items-center gap-2"
-                  style={{ fontFamily: 'Inter, sans-serif', fontWeight: '600' }}
-                >
-                  <Filter className="w-5 h-5" />
-                  <span>More Filters</span>
-                </button>
+                {(selectedSport || selectedStatus) && (
+                  <button
+                    onClick={() => {
+                      setSelectedSport('');
+                      setSelectedStatus('');
+                    }}
+                    className="bg-[#E7F8ED] text-[#0F7A33] px-6 py-3 rounded-xl hover:bg-[#0F7A33] hover:text-white transition-colors cursor-pointer"
+                    style={{ fontFamily: 'Inter, sans-serif', fontWeight: '600' }}
+                  >
+                    Clear Filters
+                  </button>
+                )}
               </div>
             </div>
 
             {/* Tournament Cards */}
             <div className="grid grid-cols-1 gap-6">
-              {tournaments.map((tournament) => (
+              {tournaments
+                .filter((t) => {
+                  if (selectedSport && t.sport.toLowerCase() !== selectedSport.toLowerCase()) return false;
+                  if (selectedStatus && t.status.toLowerCase() !== selectedStatus.toLowerCase()) return false;
+                  return true;
+                })
+                .map((tournament) => {
+                  const isJoined = joinedTournaments.includes(tournament.id);
+                  const currentParticipants = tournament.participants + (isJoined ? 1 : 0);
+                  return (
                 <div 
                   key={tournament.id}
                   className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-all"
@@ -222,7 +252,7 @@ export default function TournamentsPage() {
                               className="text-gray-900" 
                               style={{ fontFamily: 'Inter, sans-serif', fontWeight: '600', fontSize: '14px' }}
                             >
-                              {tournament.participants}/{tournament.maxParticipants}
+                              {currentParticipants}/{tournament.maxParticipants}
                             </p>
                           </div>
                         </div>
@@ -232,28 +262,34 @@ export default function TournamentsPage() {
                       <div className="mb-4">
                         <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
                           <div 
-                            className="bg-[#0F7A33] h-full rounded-full"
-                            style={{ width: `${(tournament.participants / tournament.maxParticipants) * 100}%` }}
+                            className="bg-[#0F7A33] h-full rounded-full transition-all"
+                            style={{ width: `${Math.min(100, (currentParticipants / tournament.maxParticipants) * 100)}%` }}
                           />
                         </div>
                       </div>
 
                       <button
-                        disabled={tournament.status === 'full'}
-                        className={`w-full py-3 px-6 rounded-xl transition-colors flex items-center justify-center gap-2 ${
-                          tournament.status === 'open'
+                        onClick={() => handleJoinTournament(tournament.id)}
+                        disabled={tournament.status === 'full' && !isJoined}
+                        className={`w-full py-3 px-6 rounded-xl transition-colors flex items-center justify-center gap-2 cursor-pointer ${
+                          isJoined
+                            ? 'bg-emerald-700 text-white hover:bg-emerald-800'
+                            : tournament.status === 'open'
                             ? 'bg-[#0F7A33] text-white hover:bg-[#07391A]'
                             : 'bg-gray-200 text-gray-400 cursor-not-allowed'
                         }`}
                         style={{ fontFamily: 'Inter, sans-serif', fontWeight: '600' }}
                       >
                         <Trophy className="w-5 h-5" />
-                        <span>{tournament.status === 'open' ? 'Join Tournament' : 'Tournament Full'}</span>
+                        <span>
+                          {isJoined ? 'Joined ✓ (Click to leave)' : tournament.status === 'open' ? 'Join Tournament' : 'Tournament Full'}
+                        </span>
                       </button>
                     </div>
                   </div>
                 </div>
-              ))}
+              );
+            })}
             </div>
           </div>
         </div>

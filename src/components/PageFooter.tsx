@@ -1,6 +1,8 @@
+import { useState } from 'react';
 import { Phone, Mail, MapPin, Linkedin, Facebook, Instagram, Youtube } from 'lucide-react';
 
 export function PageFooter() {
+  const [activeModal, setActiveModal] = useState<'privacy' | 'terms' | 'faqs' | null>(null);
   return (
     <footer className="bg-[#0a3d0a] text-white py-16 px-6">
       <div className="container mx-auto">
@@ -86,21 +88,93 @@ export function PageFooter() {
               All rights ©turfnation 2024
             </p>
             <div className="flex gap-6">
-              <button className="hover:text-white transition-colors" style={{ fontFamily: 'Inter, sans-serif' }}>
+              <button 
+                onClick={() => setActiveModal('privacy')}
+                className="hover:text-white transition-colors cursor-pointer" 
+                style={{ fontFamily: 'Inter, sans-serif' }}
+              >
                 Privacy Policy
               </button>
               <span>|</span>
-              <button className="hover:text-white transition-colors" style={{ fontFamily: 'Inter, sans-serif' }}>
+              <button 
+                onClick={() => setActiveModal('terms')}
+                className="hover:text-white transition-colors cursor-pointer" 
+                style={{ fontFamily: 'Inter, sans-serif' }}
+              >
                 Terms of use
               </button>
               <span>|</span>
-              <button className="hover:text-white transition-colors" style={{ fontFamily: 'Inter, sans-serif' }}>
+              <button 
+                onClick={() => setActiveModal('faqs')}
+                className="hover:text-white transition-colors cursor-pointer" 
+                style={{ fontFamily: 'Inter, sans-serif' }}
+              >
                 FAQs
               </button>
             </div>
           </div>
         </div>
       </div>
+
+      {/* Modal Popup */}
+      {activeModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
+          <div className="bg-white text-gray-900 rounded-2xl max-w-lg w-full p-6 shadow-2xl relative">
+            <button
+              onClick={() => setActiveModal(null)}
+              className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 text-2xl font-bold cursor-pointer"
+            >
+              &times;
+            </button>
+            {activeModal === 'privacy' && (
+              <div>
+                <h3 className="text-xl font-bold text-[#0F7A33] mb-4" style={{ fontFamily: 'Inter, sans-serif' }}>Privacy Policy</h3>
+                <p className="text-gray-600 text-sm leading-relaxed mb-4" style={{ fontFamily: 'Inter, sans-serif' }}>
+                  At TurfNation, your privacy is our priority. We collect only necessary details to facilitate seamless turf reservations, booking confirmations, and secure payment handling.
+                </p>
+                <p className="text-gray-600 text-sm leading-relaxed" style={{ fontFamily: 'Inter, sans-serif' }}>
+                  We do not share your private data with third parties without explicit consent.
+                </p>
+              </div>
+            )}
+            {activeModal === 'terms' && (
+              <div>
+                <h3 className="text-xl font-bold text-[#0F7A33] mb-4" style={{ fontFamily: 'Inter, sans-serif' }}>Terms of Use</h3>
+                <p className="text-gray-600 text-sm leading-relaxed mb-4" style={{ fontFamily: 'Inter, sans-serif' }}>
+                  By booking through TurfNation, users agree to arrive on time for scheduled slots, respect turf rules and equipment, and adhere to venue safety protocols.
+                </p>
+                <p className="text-gray-600 text-sm leading-relaxed" style={{ fontFamily: 'Inter, sans-serif' }}>
+                  Cancellations are subject to individual turf venue policies.
+                </p>
+              </div>
+            )}
+            {activeModal === 'faqs' && (
+              <div>
+                <h3 className="text-xl font-bold text-[#0F7A33] mb-4" style={{ fontFamily: 'Inter, sans-serif' }}>Frequently Asked Questions</h3>
+                <div className="space-y-3 text-sm text-gray-600" style={{ fontFamily: 'Inter, sans-serif' }}>
+                  <div>
+                    <h4 className="font-semibold text-gray-800">How do I receive my booking ticket?</h4>
+                    <p>After booking, a QR code digital ticket is instantly generated on your dashboard.</p>
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-gray-800">Can I list my sports venue?</h4>
+                    <p>Yes! Click "List your turf" in the navigation bar to access the Owner Dashboard.</p>
+                  </div>
+                </div>
+              </div>
+            )}
+            <div className="mt-6 text-right">
+              <button
+                onClick={() => setActiveModal(null)}
+                className="bg-[#0F7A33] text-white px-5 py-2 rounded-xl hover:bg-[#07391A] transition-colors cursor-pointer text-sm font-semibold"
+                style={{ fontFamily: 'Inter, sans-serif' }}
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </footer>
   );
 }

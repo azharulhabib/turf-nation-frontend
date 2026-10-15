@@ -31,6 +31,14 @@ export function Navbar({ transparent = false }: NavbarProps) {
             <ChevronDown className="w-4 h-4" />
           </button>
           <button 
+            onClick={() => {
+              if (window.location.pathname === '/') {
+                const el = document.getElementById('about');
+                if (el) el.scrollIntoView({ behavior: 'smooth' });
+              } else {
+                navigate('/#about');
+              }
+            }}
             className={`${transparent ? 'text-white' : 'text-gray-700'} hover:opacity-80 transition-opacity`}
             style={{ fontFamily: 'Inter, sans-serif' }}
           >

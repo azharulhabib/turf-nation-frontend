@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, MapPin, Calendar, ArrowRight, Trophy, Users, Dumbbell, Shield, ChevronDown, Heart, Star, Wifi, Sun, Car, ChevronLeft, ChevronRight, Phone, Mail, Linkedin, Facebook, Instagram, Youtube } from 'lucide-react';
+import { Search, MapPin, Calendar, ArrowRight, Trophy, Users, Dumbbell, Shield, ChevronDown, Heart, Star, Wifi, Sun, Car, ChevronRight, Phone, Mail, Linkedin, Facebook, Instagram, Youtube } from 'lucide-react';
 import { Navbar } from '../components/Navbar';
 import { PageFooter } from '../components/PageFooter';
 import heroImage from 'figma:asset/71e4abbd02d75b1872e364ad070d436fa7f31156.png';
@@ -14,9 +14,26 @@ export default function LandingPage() {
     price: '2000',
   });
 
+  const [favorites, setFavorites] = useState<number[]>([]);
+
+  const toggleFavorite = (e: React.MouseEvent, id: number) => {
+    e.stopPropagation();
+    setFavorites((prev) =>
+      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
+    );
+  };
+
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    navigate('/search', { state: searchData });
+    navigate('/search', { 
+      state: { 
+        sport: searchData.type, 
+        type: searchData.type,
+        location: searchData.location,
+        date: searchData.date,
+        price: searchData.price
+      } 
+    });
   };
 
   // Featured turfs with realistic data
@@ -74,7 +91,7 @@ export default function LandingPage() {
     {
       id: 6,
       name: 'Beach Volleyball Paradise',
-      image: 'https://images.unsplash.com/photo-1628314200733-5f785cdc925?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHx2b2xsZXliYWxsJTIwY291cnQlMjBiZWFjaHxlbnwxfHx8fDE3NjU0MDEwODN8MA&ixlib=rb-4.1.0&q=80&w=1080',
+      image: 'https://images.unsplash.com/photo-1612872087720-bb876e2e67d1?auto=format&fit=crop&w=1080&q=80',
       price: '$50/hr',
       description: 'Play, enjoy and live 90 minutes of ultimate futsal with your team…',
       location: 'Miami, USA',
@@ -84,10 +101,22 @@ export default function LandingPage() {
   ];
 
   const categories = [
-    { name: 'Football', icon: '⚽' },
-    { name: 'Cricket', icon: '🏏' },
-    { name: 'Volleyball', icon: '🏐' },
-    { name: 'Badminton', icon: '🏸' },
+    { 
+      name: 'Football', 
+      image: 'https://images.unsplash.com/photo-1713815713124-362af0201f3c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxmb290YmFsbCUyMHR1cmYlMjBmaWVsZHxlbnwxfHx8fDE3NjU0NzUwNDN8MA&ixlib=rb-4.1.0&q=80&w=1080' 
+    },
+    { 
+      name: 'Cricket', 
+      image: 'https://images.unsplash.com/photo-1730739628091-133de587ad14?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxjcmlja2V0JTIwc3RhZGl1bSUyMGdyb3VuZHxlbnwxfHx8fDE3NjU0NzUwNDR8MA&ixlib=rb-4.1.0&q=80&w=1080' 
+    },
+    { 
+      name: 'Volleyball', 
+      image: 'https://images.unsplash.com/photo-1612872087720-bb876e2e67d1?auto=format&fit=crop&w=1080&q=80' 
+    },
+    { 
+      name: 'Badminton', 
+      image: 'https://images.unsplash.com/photo-1624024834874-2a1611305604?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxiYWRtaW50b24lMjBjb3VydCUyMGluZG9vcnxlbnwxfHx8fDE3NjU0NTE3ODh8MA&ixlib=rb-4.1.0&q=80&w=1080' 
+    },
   ];
 
   return (
@@ -231,10 +260,11 @@ export default function LandingPage() {
                   />
                   {/* Heart Icon */}
                   <button 
-                    className="absolute top-4 right-4 w-10 h-10 bg-white rounded-full flex items-center justify-center hover:bg-gray-100 transition-colors shadow-md"
-                    onClick={(e) => e.stopPropagation()}
+                    className="absolute top-4 right-4 w-10 h-10 bg-white rounded-full flex items-center justify-center hover:bg-gray-100 transition-colors shadow-md cursor-pointer"
+                    onClick={(e) => toggleFavorite(e, turf.id)}
+                    aria-label="Save to favorites"
                   >
-                    <Heart className="w-5 h-5 text-gray-600" />
+                    <Heart className={`w-5 h-5 transition-colors ${favorites.includes(turf.id) ? 'text-red-500 fill-red-500' : 'text-gray-600'}`} />
                   </button>
                 </div>
 
@@ -300,61 +330,27 @@ export default function LandingPage() {
               <button
                 key={category.name}
                 onClick={() => navigate('/search', { state: { sport: category.name } })}
-                className="relative bg-gradient-to-br from-green-600 to-green-700 text-white p-12 rounded-3xl hover:scale-105 transition-transform shadow-lg overflow-hidden group"
+                className="relative h-64 rounded-3xl overflow-hidden hover:scale-105 transition-transform shadow-lg group cursor-pointer text-center"
               >
-                {/* Background Pattern */}
-                <div className="absolute inset-0 opacity-10">
-                  <div className="absolute -bottom-10 -right-10 w-32 h-32 bg-white rounded-full" />
+                <img 
+                  src={category.image} 
+                  alt={category.name} 
+                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" 
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#07391A]/90 via-[#0F7A33]/30 to-transparent group-hover:from-[#07391A] transition-colors" />
+                <div className="absolute bottom-6 left-4 right-4 text-center">
+                  <h3 className="text-white" style={{ fontSize: '20px', fontWeight: '600', fontFamily: 'Inter, sans-serif' }}>
+                    {category.name}
+                  </h3>
                 </div>
-                
-                {/* Icon */}
-                <div className="relative text-7xl mb-4">{category.icon}</div>
-                
-                {/* Category Name */}
-                <h3 className="relative text-white" style={{ fontSize: '20px', fontWeight: '600', fontFamily: 'Inter, sans-serif' }}>
-                  {category.name}
-                </h3>
               </button>
             ))}
           </div>
         </div>
       </section>
 
-      {/* OUR PARTNER SECTION */}
-      <section className="py-20 px-6 bg-green-50">
-        <div className="container mx-auto">
-          <h2 className="text-center mb-12" style={{ fontSize: '36px', fontWeight: '700', fontFamily: 'Inter, sans-serif' }}>
-            Our partner
-          </h2>
-          
-          <div className="relative max-w-5xl mx-auto">
-            {/* Partner Logos */}
-            <div className="flex items-center justify-center gap-8 flex-wrap">
-              {[1, 2, 3, 4, 5, 6, 7].map((i) => (
-                <div 
-                  key={i} 
-                  className="w-20 h-20 bg-white rounded-full flex items-center justify-center shadow-md hover:shadow-lg transition-shadow cursor-pointer"
-                >
-                  <span className="text-gray-400 text-xs" style={{ fontFamily: 'Inter, sans-serif' }}>Logo {i}</span>
-                </div>
-              ))}
-            </div>
-
-            {/* Slider Arrows */}
-            <div className="absolute right-0 top-1/2 -translate-y-1/2 flex gap-2">
-              <button className="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-md hover:bg-gray-100 transition-colors">
-                <ChevronLeft className="w-5 h-5 text-gray-600" />
-              </button>
-              <button className="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-md hover:bg-gray-100 transition-colors">
-                <ChevronRight className="w-5 h-5 text-gray-600" />
-              </button>
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* CALL-TO-ACTION SECTION */}
-      <section className="py-20 px-6 bg-white">
+      <section id="about" className="py-20 px-6 bg-white">
         <div className="container mx-auto">
           <div 
             className="relative rounded-3xl overflow-hidden shadow-2xl"

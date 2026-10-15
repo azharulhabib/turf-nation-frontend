@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Send, Megaphone, Calendar, Users } from 'lucide-react';
+import { Send, Megaphone, Calendar } from 'lucide-react';
 import { Navbar } from '../components/Navbar';
 import { PageFooter } from '../components/PageFooter';
 import { DashboardSidebar } from '../components/DashboardSidebar';
@@ -77,20 +77,17 @@ export default function AnnouncementPage() {
                   >
                     Send To
                   </label>
-                  <div className="relative">
-                    <Users className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                    <select
-                      value={targetAudience}
-                      onChange={(e) => setTargetAudience(e.target.value)}
-                      className="w-full pl-12 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0F7A33]"
-                      style={{ fontFamily: 'Inter, sans-serif' }}
-                    >
-                      <option value="all">All Users</option>
-                      <option value="upcoming">Upcoming Bookings</option>
-                      <option value="past">Past Customers</option>
-                      <option value="specific">Specific Turf Users</option>
-                    </select>
-                  </div>
+                  <select
+                    value={targetAudience}
+                    onChange={(e) => setTargetAudience(e.target.value)}
+                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0F7A33] bg-white cursor-pointer"
+                    style={{ fontFamily: 'Inter, sans-serif' }}
+                  >
+                    <option value="all">All Users</option>
+                    <option value="upcoming">Upcoming Bookings</option>
+                    <option value="past">Past Customers</option>
+                    <option value="specific">Specific Turf Users</option>
+                  </select>
                 </div>
 
                 {/* Announcement Message */}

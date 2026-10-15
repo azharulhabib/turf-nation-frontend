@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Search, MapPin, Calendar, DollarSign, SlidersHorizontal, Heart, Star, Wifi, Sun, Car } from 'lucide-react';
+import { Search, MapPin, Heart, Star, Wifi, Sun, Car } from 'lucide-react';
 import { Navbar } from '../components/Navbar';
 import { PageFooter } from '../components/PageFooter';
 
@@ -10,13 +10,32 @@ export default function TurfSearchPage() {
   const initialState = location.state || {};
 
   const [filters, setFilters] = useState({
-    sport: initialState.sport || '',
+    sport: initialState.sport || initialState.type || '',
     location: initialState.location || '',
     date: initialState.date || '',
     price: initialState.price || '',
   });
 
-  const [showFilters, setShowFilters] = useState(false);
+  const [favorites, setFavorites] = useState<number[]>([]);
+
+  useEffect(() => {
+    if (location.state?.sport || location.state?.type) {
+      setFilters((prev) => ({
+        ...prev,
+        sport: location.state.sport || location.state.type || prev.sport,
+        location: location.state.location !== undefined ? location.state.location : prev.location,
+        date: location.state.date !== undefined ? location.state.date : prev.date,
+        price: location.state.price !== undefined ? location.state.price : prev.price,
+      }));
+    }
+  }, [location.state]);
+
+  const toggleFavorite = (e: React.MouseEvent, id: number) => {
+    e.stopPropagation();
+    setFavorites((prev) =>
+      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
+    );
+  };
 
   // Mock turf data
   const turfs = [
@@ -73,7 +92,7 @@ export default function TurfSearchPage() {
     {
       id: 6,
       name: 'Beach Volleyball Paradise',
-      image: 'https://images.unsplash.com/photo-1628314200733-5f785cdc925?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHx2b2xsZXliYWxsJTIwY291cnQlMjBiZWFjaHxlbnwxfHx8fDE3NjU0MDEwODN8MA&ixlib=rb-4.1.0&q=80&w=1080',
+      image: 'https://images.unsplash.com/photo-1612872087720-bb876e2e67d1?auto=format&fit=crop&w=1080&q=80',
       price: '$35/hr',
       description: 'Beach volleyball courts with ocean view',
       location: 'Miami, USA',
@@ -96,130 +115,168 @@ export default function TurfSearchPage() {
         </h1>
 
         {/* Search & Filter Bar */}
-        <div className="bg-white rounded-2xl shadow-lg p-4 mb-8">
-          <div className="flex flex-col lg:flex-row gap-4">
-            {/* Sport Filter */}
-            <div className="flex-1">
-              <div className="relative">
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                <select
-                  value={filters.sport}
-                  onChange={(e) => setFilters({ ...filters, sport: e.target.value })}
-                  className="w-full pl-12 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0F7A33] bg-transparent"
-                  style={{ fontFamily: 'Inter, sans-serif' }}
-                >
-                  <option value="">All Sports</option>
-                  <option value="Football">Football</option>
-                  <option value="Cricket">Cricket</option>
-                  <option value="Basketball">Basketball</option>
-                  <option value="Badminton">Badminton</option>
-                  <option value="Tennis">Tennis</option>
-                  <option value="Volleyball">Volleyball</option>
-                </select>
-              </div>
-            </div>
-
-            {/* Location Filter */}
-            <div className="flex-1">
-              <div className="relative">
-                <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                <input
-                  type="text"
-                  placeholder="Location"
-                  value={filters.location}
-                  onChange={(e) => setFilters({ ...filters, location: e.target.value })}
-                  className="w-full pl-12 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0F7A33]"
-                  style={{ fontFamily: 'Inter, sans-serif' }}
-                />
-              </div>
-            </div>
-
-            {/* Date Filter */}
-            <div className="flex-1">
-              <div className="relative">
-                <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                <input
-                  type="date"
-                  value={filters.date}
-                  onChange={(e) => setFilters({ ...filters, date: e.target.value })}
-                  className="w-full pl-12 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0F7A33]"
-                  style={{ fontFamily: 'Inter, sans-serif' }}
-                />
-              </div>
-            </div>
-
-            {/* Price Filter */}
-            <div className="flex-1">
-              <div className="relative">
-                <DollarSign className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                <input
-                  type="text"
-                  placeholder="Max Price"
-                  value={filters.price}
-                  onChange={(e) => setFilters({ ...filters, price: e.target.value })}
-                  className="w-full pl-12 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0F7A33]"
-                  style={{ fontFamily: 'Inter, sans-serif' }}
-                />
-              </div>
-            </div>
-
-            {/* More Filters Button */}
-            <button
-              onClick={() => setShowFilters(!showFilters)}
-              className="bg-[#0F7A33] text-white px-6 py-3 rounded-xl hover:bg-[#07391A] transition-colors flex items-center gap-2"
-              style={{ fontFamily: 'Inter, sans-serif', fontWeight: '600' }}
+        <div className="bg-white rounded-2xl shadow-lg p-4 mb-8 flex flex-col md:flex-row gap-3 max-w-5xl items-center">
+          {/* Sport Filter */}
+          <div className="flex-1 px-4 py-2">
+            <label className="block text-gray-500 text-xs mb-1 uppercase tracking-wide" style={{ fontFamily: 'Inter, sans-serif' }}>Type</label>
+            <select
+              value={filters.sport}
+              onChange={(e) => setFilters({ ...filters, sport: e.target.value })}
+              className="w-full outline-none text-gray-900 bg-transparent cursor-pointer"
+              style={{ fontSize: '15px', fontWeight: '600', fontFamily: 'Inter, sans-serif' }}
             >
-              <SlidersHorizontal className="w-5 h-5" />
-              <span className="hidden lg:inline">Filters</span>
-            </button>
+              <option value="">All Sports</option>
+              <option value="Football">Football</option>
+              <option value="Cricket">Cricket</option>
+              <option value="Basketball">Basketball</option>
+              <option value="Badminton">Badminton</option>
+              <option value="Tennis">Tennis</option>
+              <option value="Volleyball">Volleyball</option>
+            </select>
           </div>
+
+          <div className="hidden md:block w-px h-12 bg-gray-200" />
+
+          {/* Location Filter */}
+          <div className="flex-1 px-4 py-2">
+            <label className="block text-gray-500 text-xs mb-1 uppercase tracking-wide" style={{ fontFamily: 'Inter, sans-serif' }}>Location</label>
+            <input
+              type="text"
+              placeholder="Location"
+              value={filters.location}
+              onChange={(e) => setFilters({ ...filters, location: e.target.value })}
+              className="w-full outline-none text-gray-900 bg-transparent"
+              style={{ fontSize: '15px', fontWeight: '600', fontFamily: 'Inter, sans-serif' }}
+            />
+          </div>
+
+          <div className="hidden md:block w-px h-12 bg-gray-200" />
+
+          {/* Date Filter */}
+          <div className="flex-1 px-4 py-2">
+            <label className="block text-gray-500 text-xs mb-1 uppercase tracking-wide" style={{ fontFamily: 'Inter, sans-serif' }}>Date</label>
+            <input
+              type="date"
+              value={filters.date}
+              onChange={(e) => setFilters({ ...filters, date: e.target.value })}
+              className="w-full outline-none text-gray-900 bg-transparent cursor-pointer"
+              style={{ fontSize: '15px', fontWeight: '600', fontFamily: 'Inter, sans-serif' }}
+            />
+          </div>
+
+          <div className="hidden md:block w-px h-12 bg-gray-200" />
+
+          {/* Price Filter */}
+          <div className="flex-1 px-4 py-2">
+            <label className="block text-gray-500 text-xs mb-1 uppercase tracking-wide" style={{ fontFamily: 'Inter, sans-serif' }}>Price</label>
+            <input
+              type="text"
+              placeholder="Max Price"
+              value={filters.price}
+              onChange={(e) => setFilters({ ...filters, price: e.target.value })}
+              className="w-full outline-none text-gray-900 bg-transparent"
+              style={{ fontSize: '15px', fontWeight: '600', fontFamily: 'Inter, sans-serif' }}
+            />
+          </div>
+
+          <button
+            type="button"
+            className="bg-green-600 text-white p-4 rounded-xl hover:bg-green-700 transition-colors flex items-center justify-center shadow-lg cursor-pointer"
+            aria-label="Search"
+          >
+            <Search className="w-6 h-6" />
+          </button>
         </div>
 
         {/* Results Count */}
-        <div className="mb-6">
-          <p 
-            className="text-gray-600" 
-            style={{ fontFamily: 'Inter, sans-serif', fontSize: '16px' }}
-          >
-            Showing <span className="font-semibold text-[#0F7A33]">{turfs.length}</span> turfs available
-          </p>
-        </div>
+        {(() => {
+          const filteredTurfs = turfs.filter((turf) => {
+            if (filters.sport && !turf.sports.some((s) => s.toLowerCase() === filters.sport.toLowerCase())) {
+              return false;
+            }
+            if (filters.location && !turf.location.toLowerCase().includes(filters.location.toLowerCase())) {
+              return false;
+            }
+            if (filters.price) {
+              const maxPrice = parseFloat(filters.price.replace(/[^0-9.]/g, ''));
+              const turfPrice = parseFloat(turf.price.replace(/[^0-9.]/g, ''));
+              if (!isNaN(maxPrice) && !isNaN(turfPrice) && turfPrice > maxPrice) {
+                return false;
+              }
+            }
+            return true;
+          });
 
-        {/* Turf Cards Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {turfs.map((turf) => (
-            <div 
-              key={turf.id} 
-              className="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 cursor-pointer group"
-              onClick={() => navigate(`/turf/${turf.id}`)}
-            >
-              {/* Image */}
-              <div className="relative h-52 overflow-hidden">
-                <img 
-                  src={turf.image} 
-                  alt={turf.name}
-                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                />
-                {/* Heart Icon */}
-                <button 
-                  className="absolute top-4 right-4 w-10 h-10 bg-white rounded-full flex items-center justify-center hover:bg-gray-100 transition-colors shadow-md"
-                  onClick={(e) => e.stopPropagation()}
+          return (
+            <>
+              <div className="mb-6 flex items-center justify-between">
+                <p 
+                  className="text-gray-600" 
+                  style={{ fontFamily: 'Inter, sans-serif', fontSize: '16px' }}
                 >
-                  <Heart className="w-5 h-5 text-gray-600" />
-                </button>
-                {/* Sport Badges */}
-                <div className="absolute bottom-4 left-4 flex gap-2">
-                  {turf.sports.map((sport) => (
-                    <span 
-                      key={sport}
-                      className="bg-[#0F7A33] text-white px-3 py-1 rounded-full text-xs"
-                      style={{ fontFamily: 'Inter, sans-serif', fontWeight: '600' }}
-                    >
-                      {sport}
-                    </span>
-                  ))}
-                </div>
+                  Showing <span className="font-semibold text-[#0F7A33]">{filteredTurfs.length}</span> turfs available
+                </p>
+                {(filters.sport || filters.location || filters.price || filters.date) && (
+                  <button
+                    onClick={() => setFilters({ sport: '', location: '', date: '', price: '' })}
+                    className="text-[#0F7A33] hover:underline text-sm font-semibold cursor-pointer"
+                    style={{ fontFamily: 'Inter, sans-serif' }}
+                  >
+                    Clear all filters
+                  </button>
+                )}
               </div>
+
+              {filteredTurfs.length === 0 ? (
+                <div className="bg-white rounded-2xl shadow-lg p-12 text-center my-6">
+                  <p className="text-gray-600 text-lg mb-4" style={{ fontFamily: 'Inter, sans-serif' }}>
+                    No turfs found matching your filter criteria.
+                  </p>
+                  <button
+                    onClick={() => setFilters({ sport: '', location: '', date: '', price: '' })}
+                    className="bg-[#0F7A33] text-white px-6 py-2.5 rounded-full hover:bg-[#07391A] transition-colors cursor-pointer"
+                    style={{ fontFamily: 'Inter, sans-serif', fontWeight: '600' }}
+                  >
+                    Reset Filters
+                  </button>
+                </div>
+              ) : (
+                /* Turf Cards Grid */
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {filteredTurfs.map((turf) => (
+                    <div 
+                      key={turf.id} 
+                      className="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 cursor-pointer group"
+                      onClick={() => navigate(`/turf/${turf.id}`)}
+                    >
+                      {/* Image */}
+                      <div className="relative h-52 overflow-hidden">
+                        <img 
+                          src={turf.image} 
+                          alt={turf.name}
+                          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" 
+                        />
+                        {/* Heart Icon */}
+                        <button 
+                          className="absolute top-4 right-4 w-10 h-10 bg-white rounded-full flex items-center justify-center hover:bg-gray-100 transition-colors shadow-md cursor-pointer"
+                          onClick={(e) => toggleFavorite(e, turf.id)}
+                          aria-label="Save to favorites"
+                        >
+                          <Heart className={`w-5 h-5 transition-colors ${favorites.includes(turf.id) ? 'text-red-500 fill-red-500' : 'text-gray-600'}`} />
+                        </button>
+                        {/* Sport Badges */}
+                        <div className="absolute bottom-4 left-4 flex gap-2">
+                          {turf.sports.map((sport) => (
+                            <span 
+                              key={sport}
+                              className="bg-[#0F7A33] text-white px-3 py-1 rounded-full text-xs"
+                              style={{ fontFamily: 'Inter, sans-serif', fontWeight: '600' }}
+                            >
+                              {sport}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
 
               {/* Content */}
               <div className="p-5">
@@ -266,8 +323,12 @@ export default function TurfSearchPage() {
                 </div>
               </div>
             </div>
-          ))}
-        </div>
+                  ))}
+                </div>
+              )}
+            </>
+          );
+        })()}
       </div>
 
       <PageFooter />

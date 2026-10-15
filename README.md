@@ -63,8 +63,3 @@ src/
    ```
    Compiled assets are generated in the `build/` directory.
 
----
-
-## License
-
-This project is licensed under the MIT License.
