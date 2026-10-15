@@ -1,36 +1,70 @@
- # TurfNation 🌱⚽
+# TurfNation Frontend
 
-TurfNation is a modern turf booking platform where users can discover, search, and book sports turfs easily.  
-This repository contains the **frontend** of the TurfNation project, built with modern web technologies.
-
----
-
-## 🚀 Tech Stack
-
-- **React** (with Vite)
-- **TypeScript**
-- **Tailwind CSS**
-- **React Router**
-- **shadcn/ui**
+TurfNation is a responsive sports turf discovery, booking, and management web application. This repository contains the client-side single-page application built with React, TypeScript, Vite, and Tailwind CSS.
 
 ---
 
-## 📌 Features
+## Tech Stack
 
-- Modern landing page UI
-- Turf search interface
-- Responsive design
-- Scalable component structure
-- Ready for backend integration (JWT-based auth planned)
+- **Framework**: React 18 with TypeScript
+- **Build Tool**: Vite 6 (SWC plugin)
+- **Styling**: Tailwind CSS v4
+- **UI Components**: shadcn/ui (Radix UI primitives)
+- **Icons**: Lucide React
+- **Charts**: Recharts
+- **Routing**: React Router DOM
 
+---
 
-## 🛠️ Getting Started
+## Features
+
+- **Player Experience**: Turf search by sport and city, interactive time-slot booking with dynamic pricing, booking confirmation, downloadable QR code entry pass, weather forecasts, tournaments, and loyalty rewards.
+- **Turf Owner Portal**: Dashboard tracking revenue and daily bookings, turf listing and court management, and announcement broadcasts.
+- **Admin Analytics**: High-level platform metrics covering revenue trends, active players, and partner venues.
+
+---
+
+## Project Structure
+
+```text
+src/
+├── assets/         # Static images and icons
+├── components/     # UI and layout components (Navbar, Footers, TurfCard, ui/ primitives)
+├── context/        # AuthContext and BookingContext providers
+├── data/           # Mock data for turfs, slots, and tournaments
+└── pages/          # Application views (Search, Booking, Dashboards, Analytics)
+```
+
+---
+
+## Getting Started
 
 ### Prerequisites
+
 - Node.js (v18 or later recommended)
-- npm
+- npm, yarn, or pnpm
 
-### Installation
+### Installation & Development
 
-```bash
-npm install
+1. Install dependencies:
+   ```bash
+   npm install
+   ```
+
+2. Start the development server:
+   ```bash
+   npm run dev
+   ```
+   The application runs locally at `http://localhost:3000`.
+
+3. Create a production build:
+   ```bash
+   npm run build
+   ```
+   Compiled assets are generated in the `build/` directory.
+
+---
+
+## License
+
+This project is licensed under the MIT License.
